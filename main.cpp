@@ -3,8 +3,8 @@
 using namespace std;
 
 int main() {
-   string BasicInput = "Input1.txt"; // Input with no links
-   string LinkInput = "Input2.txt"; // Input with links
+   string BasicInput = "Input3.txt"; // Input with no links
+   string LinkInput = "Input3.txt"; // Input with links
 
    map<string, Data> Info;
    map<int, string> Links;
@@ -88,22 +88,23 @@ vector<string> cleanline(string& line) {
 vector<string> getLink(string& line) {
    vector<string> link;
    string word;
-   size_t found = line.find("http");
    istringstream Line(line);
 
+   vector<string> LinkEndings = {".lt", ".com", ".org", ".net", ".edu", ".gov", ".io", ".co", ".us", ".uk", ".de", ".jp", ".fr", ".au", ".ru", ".ch", ".it", ".nl", ".se", ".no", ".es", ".mil",
+   ".lt/", ".com/", ".org/", ".net/", ".edu/", ".gov/", ".io/", ".co/", ".us/", ".uk/", ".de/", ".jp/", ".fr/", ".au/", ".ru/", ".ch/", ".it/", ".nl/", ".se/", ".no/", ".es/", ".mil/"};
    while (Line >> word) {
-      if (word.find("http") != string::npos) {
+      for (int i = 0; i < LinkEndings.size(); i++){
+         if (word.find(LinkEndings[i]) != string::npos) {
          link.push_back(word);
+         }
       }
    }
-
    return link;
 }
 
 // Function for printing out words
 void Output(map<string, Data>& map) {
    ofstream output;
-
    output.open("Word_Counter.txt");
 
    for (const auto &duom : map) {
@@ -112,7 +113,17 @@ void Output(map<string, Data>& map) {
       }
    }
 
-   output.close();
+output.close();
+
+ofstream output2;
+output2.open("Words_ris.txt");
+   for (const auto &duom : map) {
+      if (duom.first.find("ris") != string::npos) {
+         output2 << duom.second.number << ", " << duom.first << endl;
+      }
+   }
+
+   output2.close();
    cout << "Words have been counted and results been writen to the file: Word_Counter.txt" << endl;
 }
 
@@ -136,15 +147,14 @@ void CrossReferenceTable(map<string, Data>& map) {
 
    output.open("Output_Table.txt");
 
-   output << left << setw(20) << "Word" << "| " << setw(51) << "Line" << endl;
-   output << "-----------------------------------------------------------------------" << endl;
+   output << "        Word        |                       Line                       "<< endl;
+   output << "--------------------|--------------------------------------------------" << endl;
 
    for (const auto &duom : map) {
-      const string& word = duom.first;
       const Data& data = duom.second;
 
       if (data.number > 1) {
-         output << left << setw(20) << word << "|";
+         output << left << setw(20) << duom.first << "|";
 
          for (int line : data.lines) {
             output << line << ", ";
